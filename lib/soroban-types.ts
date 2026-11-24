@@ -12,7 +12,7 @@ export const STROOPS_PER_XLM = 10_000_000;
  * Converts XLM amount (floating or integer) to stroops (integer bigint)
  */
 export function xlmToStroops(xlmAmount: number): bigint {
-  return BigInt(Math.floor(xlmAmount * STROOPS_PER_XLM));
+  return BigInt(Math.round(xlmAmount * STROOPS_PER_XLM));
 }
 
 /**

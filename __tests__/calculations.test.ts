@@ -14,6 +14,7 @@ import {
   calculatePoolPercentages,
   PLATFORM_FEE,
 } from "@/lib/calculations";
+import { xlmToStroops, stroopsToXlm, STROOPS_PER_XLM } from "@/lib/soroban-types";
 
 // ── calculateCompletedPayout ──────────────────────────────────────────────────
 
@@ -169,5 +170,25 @@ describe("calculatePoolPercentages", () => {
     const result = calculatePoolPercentages(0, 500);
     expect(result.yes).toBe(0);
     expect(result.no).toBe(100);
+  });
+});
+
+// ── xlmToStroops (#507) ───────────────────────────────────────────────────────
+
+describe("xlmToStroops (#507)", () => {
+  it("accurately converts fractional XLM without losing a stroop to floating-point truncation", () => {
+    // 0.1 * 10,000,000 in JS floating point evaluates to 999999.9999999999
+    // Math.floor would return 999999n instead of 1000000n
+    expect(xlmToStroops(0.1)).toBe(1_000_000n);
+    expect(xlmToStroops(1)).toBe(10_000_000n);
+    expect(xlmToStroops(0.2)).toBe(2_000_000n);
+    expect(xlmToStroops(0.0000001)).toBe(1n);
+    expect(xlmToStroops(12.3456789)).toBe(123_456_789n);
+  });
+
+  it("roundtrips with stroopsToXlm correctly", () => {
+    const amount = 5.5;
+    const stroops = xlmToStroops(amount);
+    expect(stroopsToXlm(stroops)).toBe(amount);
   });
 });
